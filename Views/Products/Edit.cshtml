@@ -1,0 +1,84 @@
+@{
+  ViewData["Title"] = "Edit Product";
+}
+
+<form id="productForm" action="">
+  <div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" class="form-control" id="name" placeholder="Enter name">
+  </div>
+  <div class="form-group">
+    <label for="price">Price</label>
+    <input type="text" class="form-control" id="price" placeholder="Enter price">
+  </div>
+  <div class="form-group">
+    <label for="description">Description</label>
+    <input type="text" class="form-control" id="description" placeholder="Enter description">
+  </div>
+  <div class="form-group">
+    <label for="category">Stock</label>
+    <input type="text" class="form-control" id="category" placeholder="Enter category">
+  </div>
+  
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+@section Scripts {
+  <script>
+    var token = localStorage.getItem('jwtToken');
+    var id = @Html.Raw(ViewData["id"]);
+
+    // get product
+    $.ajax({
+      url: 'http://localhost:5236/api/productapi/' + id,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      success: function (data, textStatus, xhr) {
+        $('#name').val(data.name);
+        $('#price').val(data.price);
+        $('#description').val(data.description);
+        $('#category').val(data.stock);
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        alert('Error: ' + xhr.responseJSON.Message);
+      }
+})
+
+
+    $('#productForm').submit(function (event) {
+      event.preventDefault();
+
+      var name = $('#name').val();
+      var price = $('#price').val();
+      var description = $('#description').val();
+      var stock = $('#category').val();
+
+      // Send AJAX request to authenticate user
+      $.ajax({
+        url: 'http://localhost:5236/api/productapi/'+ id,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        data: JSON.stringify({
+          productId: id,
+          name: name,
+          price: price,
+          description: description,
+          stock: stock
+        }),
+        success: function (data, textStatus, xhr) {
+          window.location.href = '/products';
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          alert('Error: ' + xhr.responseJSON.Message);
+        }
+      });
+    });
+    
+  </script>
+}

@@ -1,0 +1,77 @@
+@{
+  ViewData["Title"] = "Products";
+}
+
+<div class="row mb-3">
+    <div class="col-md-8">
+        <h1>Products</h1>
+    </div>
+    <div class="col-md-4 d-flex justify-content-end align-items-center">
+        <a class="btn btn-primary" href="/Products/Create">Create New</a>
+    </div>
+</div>
+
+<table id="productTable">
+    <thead>
+        <tr>
+            <th>Product Id</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Stock</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+      $(document).ready(function() {
+      var token = localStorage.getItem('jwtToken');
+
+      $('#productTable').DataTable({
+          ajax: {
+              url: 'http://localhost:5236/api/productapi',
+              headers: {
+                  'Authorization': 'Bearer ' + token
+              },
+              dataSrc: ''
+          },
+          columns: [
+              { data: 'productId' },
+              { data: 'name' },
+              { data: 'price' },
+              { data: 'description' },
+              { data: 'stock' }
+          ],
+          columnDefs: [
+              {
+                  targets: 5,
+                  data: null,
+                  render: function (data, type, row) {
+                      return '<a class="btn btn-primary" href="/Products/Edit/' + data.productId + '">Edit</a><button type="button" class="btn btn-danger" onclick="deleteProduct('+data.productId+')">Delete</button>';
+                  }
+              }
+          ]
+      });
+  });
+
+  function deleteProduct(id) {
+      var token = localStorage.getItem('jwtToken');
+
+      $.ajax({
+          url: 'http://localhost:5236/api/productapi/' + id,
+          type: 'DELETE',
+          headers: {
+              'Authorization': 'Bearer ' + token
+          },
+          success: function (result) {
+              alert('Product deleted successfully');
+              location.reload();
+          }
+      });
+  }
+    </script>
+}
